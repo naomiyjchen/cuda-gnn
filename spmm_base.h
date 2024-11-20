@@ -60,6 +60,5 @@ protected:
             ret = measured_time / times;
         }
         return ret;
-    }
-    
+    }    
 };
