@@ -13,7 +13,7 @@ inline double getDuration(std::chrono::time_point<std::chrono::system_clock> a,
 const int WARPS_PER_BLOCK = 16;
 const int WARP_SIZE = 32;
 const int N = 232965 / 256 * 256;
-const int dim_in = 256, dim_out = 128;
+const int dim_in = 256, dim_out = 64;
 const int window_size = dim_in / dim_out;
 const int windows_per_thread = (dim_out + WARP_SIZE - 1) / WARP_SIZE; 
 
@@ -28,7 +28,7 @@ void printIndices(const int*, int, int, const string&);
 
 
 int main() {
-    cout << "Test Max Pool 1D  kernel" << endl;
+    cout << "Max Pool 1D  kernel" << endl;
     cout<<"N = "<< N << ", dim_in = " << dim_in << ", dim_out = " << dim_out << ", preparing data..."<<endl;
 
     /*
@@ -53,15 +53,16 @@ int main() {
     
     cout << "data ready, testing..." << endl;
 
-    int shared_size = WARPS_PER_BLOCK * dim_in * sizeof(float);
+    int shared_mem_size = WARPS_PER_BLOCK * dim_in * sizeof(float);
     int grid_size = N / WARPS_PER_BLOCK;
     int block_size = WARPS_PER_BLOCK * WARP_SIZE;
 
+	cout<<"Config GridDim = "<< N / WARPS_PER_BLOCK << ", BlockDim = " << WARPS_PER_BLOCK * 32 << ", shared_mem_size = " << shared_mem_size << endl;
 
     // warmp up
     int times = 100;
     for (int i = 0; i < times; i++) {
-        max_pool_1d<<< grid_size, block_size, shared_size>>>(data, values, indices);
+        max_pool_1d<<< grid_size, block_size, shared_mem_size>>>(data, values, indices);
     }
     cudaDeviceSynchronize();
 
@@ -71,7 +72,7 @@ int main() {
 
     for (int i = 0; i < times; i++) {  
         timestamp(t0);
-        max_pool_1d<<< grid_size, block_size, shared_size>>>(data, values, indices);
+        max_pool_1d<<< grid_size, block_size, shared_mem_size>>>(data, values, indices);
         cudaDeviceSynchronize();
         
         timestamp(t1);
@@ -81,9 +82,9 @@ int main() {
     cout << "max pool 1d kernel time = " << measured_time / times * 1000 << " ms" << endl;
 
 
-    printValues(data, 1, dim_in, "Data (input)");
-    printValues(values, 1, dim_out, "Value (output)");
-    printIndices(indices, 1, dim_out, "indices (output)");
+    // printValues(data, 1, dim_in, "Data (input)");
+    // printValues(values, 1, dim_out, "Value (output)");
+    // printIndices(indices, 1, dim_out, "indices (output)");
    
  
     cudaFree(data);
