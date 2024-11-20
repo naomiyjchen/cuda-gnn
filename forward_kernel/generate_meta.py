@@ -5,7 +5,7 @@ import os
 base_path = "./graphs/"
 fileset = Path(base_path).glob('*.indptr')
 
-num_warps = 12
+num_warps = 16
 warp_max_nz = 64
 deg_bound = num_warps * warp_max_nz
 
