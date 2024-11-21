@@ -63,15 +63,7 @@ int main() {
         measured_time += getDuration(t0, t1);
     }
 
-    cout << "top-k time = " << measured_time / times * 1000 << " ms" <<endl;
-
-    for (int i = 0; i < 64; i += 1) {
-        cout << "value[" << i << "] = " << *(value + i) << endl;
-    }
-
-    for (int i = 0; i < 64; i += 1) {
-        cout << "indices[" << i << "] = " << *(indices + i) << endl;
-    }
+    cout << "top-k time = " << measured_time / times * 1000 << " ms" <<endl; 
 
     cudaFree(data);
     cudaFree(value);
